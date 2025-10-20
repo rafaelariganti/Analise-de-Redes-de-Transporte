@@ -1,7 +1,7 @@
 # Projeto Prático em Java – Representação e Análise de Redes de Transporte
 
 # Integrantes: 
-Isadora Carvalho, Maria Julia Loureiro, Mike Willy, Rafaela Riganti e Sophia Araujo
+Isadora Carvalho, Maria Julia Loureiro, Mike Willy, Rafaela Riganti, Ronaldo Araujo e Sophia Araujo
 
 ## 🎯 Objetivo Geral
 
