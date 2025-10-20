@@ -1,7 +1,8 @@
 # Projeto Prático em Java – Representação e Análise de Redes de Transporte
 
 # Integrantes: 
-## Isadora Carvalho, Maria Julia Loureiro, Mike Willy, Rafaela Riganti e Sophia Araujo
+Isadora Carvalho, Maria Julia Loureiro, Mike Willy, Rafaela Riganti e Sophia Araujo
+
 ## 🎯 Objetivo Geral
 
 Desenvolver um sistema em Java para representar e analisar uma rede de transporte urbano (ônibus, coleta de recicláveis ou logística), utilizando estruturas de grafos e árvores, leitura de arquivos `.txt`, representação gráfica da rede e pesquisa sobre análise de complexidade.
