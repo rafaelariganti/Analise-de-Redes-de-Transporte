@@ -2,6 +2,7 @@ package redestransporte;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,8 +46,89 @@ public class Grafo {
             System.err.println("Conexão inválida: Estação não encontrada. " + conexao);
         }
     }
+    
+    // --- MÉTODOS CRUD (ATUALIZADOS) ---
+    
+    /**
+     * Retorna uma Estação pelo seu ID, ou null se não existir.
+     * @param id O ID da estação
+     * @return A Estacao ou null
+     */
+    public Estacao getEstacaoPorId(int id) {
+        return estacoes.get(id);
+    }
 
-    // --- MÉTODOS DE GERAÇÃO DAS MATRIZES (Chamados no carregarDados) ---
+    // --- NOVO MÉTODO ---
+    /**
+     * Encontra o maior ID de estação atualmente em uso.
+     * @return O maior ID, ou 0 se não houver estações.
+     */
+    public int getMaiorIdEstacao() {
+        if (estacoes.isEmpty()) {
+            return 0; // Se não há estações, o próximo pode ser 1
+        }
+        // Encontra o maior valor nas chaves (IDs) do mapa
+        return Collections.max(estacoes.keySet());
+    }
+    
+    /**
+     * Retorna uma Coleção de todas as Estações no grafo.
+     * @return Coleção de Estações
+     */
+    public Collection<Estacao> getTodasEstacoes() {
+        return estacoes.values();
+    }
+    
+    /**
+     * Remove uma estação e todas as conexões associadas a ela.
+     * @param idEstacao O ID da estação a remover
+     * @return true se a estação foi encontrada e removida, false caso contrário.
+     */
+    public boolean removerEstacao(int idEstacao) {
+        if (!estacoes.containsKey(idEstacao)) {
+            return false; // Estação não existe
+        }
+        
+        // 1. Remove a estação
+        estacoes.remove(idEstacao);
+        
+        // 2. Remove todas as conexões ligadas a ela
+        // (Itera de trás para frente para evitar problemas ao remover da lista)
+        for (int i = conexoes.size() - 1; i >= 0; i--) {
+            Conexao c = conexoes.get(i);
+            if (c.getIdOrigem() == idEstacao || c.getIdDestino() == idEstacao) {
+                conexoes.remove(i);
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Remove uma conexão entre duas estações.
+     * @param idOrigem ID da estação de origem
+     * @param idDestino ID da estação de destino
+     * @return true se a conexão foi encontrada e removida, false caso contrário.
+     */
+    public boolean removerConexao(int idOrigem, int idDestino) {
+        // Itera de trás para frente
+        for (int i = conexoes.size() - 1; i >= 0; i--) {
+            Conexao c = conexoes.get(i);
+            
+            // Verifica nos dois sentidos, já que o grafo não é direcionado
+            if ((c.getIdOrigem() == idOrigem && c.getIdDestino() == idDestino) ||
+                (c.getIdOrigem() == idDestino && c.getIdDestino() == idOrigem)) {
+                
+                conexoes.remove(i);
+                return true; // Encontrou e removeu
+            }
+        }
+        return false; // Não encontrou a conexão
+    }
+    
+    // --- FIM DOS MÉTODOS CRUD ---
+
+
+    // --- MÉTODOS DE GERAÇÃO DAS MATRIZES (sem alterações) ---
 
     private void construirMapeamentoIndices() {
         // Limpa mapas antigos
@@ -77,6 +159,12 @@ public class Grafo {
 
         // Preenche com os pesos
         for (Conexao c : conexoes) {
+            // Pode acontecer se uma estação foi removida mas as matrizes não
+            // foram regeradas ainda
+            if (idParaIndice.get(c.getIdOrigem()) == null || idParaIndice.get(c.getIdDestino()) == null) {
+                continue; 
+            }
+            
             int idxOrigem = idParaIndice.get(c.getIdOrigem());
             int idxDestino = idParaIndice.get(c.getIdDestino());
             
@@ -87,7 +175,13 @@ public class Grafo {
     }
 
     public void gerarMatrizIncidencia() {
-        if (conexoes.isEmpty() || estacoes.isEmpty()) return;
+        if (conexoes.isEmpty() || estacoes.isEmpty()) {
+            // Limpa a matriz se não houver estações ou conexões
+             int numEstacoes = estacoes.size();
+             matrizIncidencia = new int[numEstacoes][0];
+             construirMapeamentoIndices();
+            return;
+        }
         
         construirMapeamentoIndices(); // Garante que os mapas de índice estão criados
         int numEstacoes = estacoes.size();
@@ -102,23 +196,31 @@ public class Grafo {
         // Preenche a matriz
         for (int j = 0; j < numConexoes; j++) {
             Conexao c = conexoes.get(j);
+            
+            if (idParaIndice.get(c.getIdOrigem()) == null || idParaIndice.get(c.getIdDestino()) == null) {
+                continue;
+            }
+            
             int idxOrigem = idParaIndice.get(c.getIdOrigem());
             int idxDestino = idParaIndice.get(c.getIdDestino());
 
             // 1 para saída (origem), -1 para entrada (destino)
-            // (Ou ambos 1 se não quiser indicar direção)
             matrizIncidencia[idxOrigem][j] = 1; 
             matrizIncidencia[idxDestino][j] = -1; 
         }
     }
-
-    // --- MÉTODOS PARA O MENU 1 (Representações) ---
+    
+    // --- MÉTODOS PARA O MENU 1 (Representações) - (sem alterações) ---
 
     public String getMatrizAdjacencia() {
         return formatarMatriz("Matriz de Adjacência (IDs)", matrizAdjacencia);
     }
 
     public String getMatrizIncidencia() {
+        if (conexoes.isEmpty()) {
+            return "Matriz de Incidência\n\n(Nenhuma conexão para exibir)";
+        }
+        
         // Cabeçalho para a Matriz de Incidência (mostrando as conexões)
         StringBuilder header = new StringBuilder("        "); // Espaço para os IDs das estações
         for(int j = 0; j < conexoes.size(); j++) {
@@ -131,6 +233,8 @@ public class Grafo {
     }
 
     public String getListaArestas() {
+        if(conexoes.isEmpty()) return "Lista de Arestas (Conexões):\n\n(Nenhuma conexão)";
+        
         StringBuilder sb = new StringBuilder("Lista de Arestas (Conexões):\n\n");
         for (Conexao c : conexoes) {
             String nomeOrigem = estacoes.get(c.getIdOrigem()).getNome();
@@ -142,6 +246,8 @@ public class Grafo {
     }
 
     public String getListaSucessores() {
+        if(estacoes.isEmpty()) return "Lista de Sucessores (Adjacências):\n\n(Nenhuma estação)";
+        
         StringBuilder sb = new StringBuilder("Lista de Sucessores (Adjacências):\n\n");
         int numEstacoes = estacoes.size();
 
@@ -167,9 +273,11 @@ public class Grafo {
         return sb.toString();
     }
 
-    // --- MÉTODOS PARA O MENU 2 (Operações) ---
+    // --- MÉTODOS PARA O MENU 2 (Operações) - (sem alterações) ---
 
     public String calcularGraus() {
+        if(estacoes.isEmpty()) return "Grau dos Vértices (Estações):\n\n(Nenhuma estação)";
+        
         StringBuilder sb = new StringBuilder("Grau dos Vértices (Estações):\n\n");
         int numEstacoes = estacoes.size();
         
@@ -289,7 +397,7 @@ public class Grafo {
     }
 
 
-    // --- MÉTODOS AUXILIARES ---
+    // --- MÉTODOS AUXILIARES (sem alterações) ---
 
     // Formata uma matriz para exibição
     private String formatarMatriz(String titulo, int[][] matriz) {
@@ -299,6 +407,9 @@ public class Grafo {
     private String formatarMatriz(String titulo, int[][] matriz, boolean mostrarHeaderIds) {
         if (matriz == null) {
             return titulo + "\nMatriz ainda não gerada.";
+        }
+        if (estacoes.isEmpty()) {
+            return titulo + "\n\n(Nenhuma estação para exibir)";
         }
         
         StringBuilder sb = new StringBuilder(titulo + "\n\n");
@@ -333,7 +444,8 @@ public class Grafo {
     private String construirCaminho(int idxOrigem, int idxDestino, int[] anterior, int[] distancias, boolean usarPeso) {
         List<Integer> caminhoIndices = new ArrayList<>();
         int idxAtual = idxDestino;
-
+        
+        // Verifica se o destino é alcançável
         if (anterior[idxAtual] == -1 && idxAtual != idxOrigem) {
             return "Caminho não encontrado da estação " + estacoes.get(indiceParaId.get(idxOrigem)).getNome() +
                    " para " + estacoes.get(indiceParaId.get(idxDestino)).getNome() + ".";
