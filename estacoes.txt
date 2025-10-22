@@ -1,0 +1,8 @@
+1;Terminal Central
+2;Ecoponto Norte
+3;Ecoponto Sul
+4;Estação Leste
+5;Estação Oeste
+6;Terminal Rodoviário
+7;Praça da Sé
+8;Avenida Paulista
