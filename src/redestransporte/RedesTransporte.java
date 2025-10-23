@@ -101,14 +101,14 @@ public class RedesTransporte {
         }
     }
     
-    // --- MÉTODOS DOS MENUS (sem alterações) ---
-    
+    // --- MÉTODO ATUALIZADO ---
     private static void menuRepresentacoes() {
         String[] opcoes = {
             "Matriz de Adjacência",
             "Matriz de Incidência",
             "Lista de Arestas",
             "Lista de Sucessores",
+            "Gerar Código do Diagrama (Mermaid)", // --- ATUALIZADO ---
             "Voltar"
         };
         
@@ -120,14 +120,26 @@ public class RedesTransporte {
         if (escolha == null || escolha.equals("Voltar")) return;
         
         String resultado = "";
+        String titulo = "Representação"; // Título padrão
+
         switch (escolha) {
             case "Matriz de Adjacência": resultado = grafo.getMatrizAdjacencia(); break;
             case "Matriz de Incidência": resultado = grafo.getMatrizIncidencia(); break;
             case "Lista de Arestas": resultado = grafo.getListaArestas(); break;
             case "Lista de Sucessores": resultado = grafo.getListaSucessores(); break;
+            
+            // --- ATUALIZADO ---
+            case "Gerar Código do Diagrama (Mermaid)":
+                resultado = grafo.gerarCodigoMermaid();
+                titulo = "Código Mermaid (para o Diagrama)"; // Título customizado
+                break;
+            default:
+                break;
         }
-        mostrarTextoGrande(resultado, "Representação");
+        
+        mostrarTextoGrande(resultado, titulo);
     }
+    // --- FIM DA ATUALIZAÇÃO ---
     
     private static void menuOperacoes() {
         String[] opcoes = {
@@ -207,11 +219,8 @@ public class RedesTransporte {
         }
     }
     
-    // --- MÉTODOS CRUD (ATUALIZADOS) ---
+    // --- MÉTODOS CRUD (sem alterações) ---
 
-    /**
-     * Menu para Adicionar/Remover Estações e Conexões.
-     */
     private static void menuGerenciamento() {
         String[] opcoes = {
             "Adicionar Estação",
@@ -236,7 +245,6 @@ public class RedesTransporte {
         }
     }
 
-    // --- MÉTODO ATUALIZADO ---
     private static void crudAdicionarEstacao() {
         try {
             // 1. Pega o maior ID em uso e soma 1
@@ -269,7 +277,6 @@ public class RedesTransporte {
             JOptionPane.showMessageDialog(null, "Ocorreu um erro: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
-    // --- FIM DA ATUALIZAÇÃO ---
 
     private static void crudAdicionarConexao() {
         try {

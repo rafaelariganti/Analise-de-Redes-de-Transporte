@@ -47,7 +47,7 @@ public class Grafo {
         }
     }
     
-    // --- MÉTODOS CRUD (ATUALIZADOS) ---
+    // --- MÉTODOS CRUD (NOVOS) ---
     
     /**
      * Retorna uma Estação pelo seu ID, ou null se não existir.
@@ -58,7 +58,6 @@ public class Grafo {
         return estacoes.get(id);
     }
 
-    // --- NOVO MÉTODO ---
     /**
      * Encontra o maior ID de estação atualmente em uso.
      * @return O maior ID, ou 0 se não houver estações.
@@ -489,6 +488,48 @@ public class Grafo {
         }
         sb.append("Número de Paradas: " + (caminhoIndices.size() - 1) + "\n");
 
+        return sb.toString();
+    }
+
+    // --- MÉTODO ATUALIZADO (GERA CÓDIGO MERMAID) ---
+    /**
+     * Gera um código na linguagem Mermaid.js para visualização do grafo.
+     * @return Uma string contendo o código-fonte do grafo em Mermaid.
+     */
+    public String gerarCodigoMermaid() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("graph LR;\n"); // LR = Left to Right (Esquerda para Direita)
+        sb.append("\n    %% --- Definição dos Nós (Estações) --- \n");
+        
+        // 1. Define todos os nós primeiro.
+        // Sintaxe Mermaid: ID["Texto do Nó"]
+        for (Estacao e : estacoes.values()) {
+            sb.append("    ");
+            sb.append(e.getId()); // Usa o ID numérico como ID do nó
+            sb.append("[\"");
+            sb.append(e.getNome().replace("\"", "")); // Remove aspas do nome
+            sb.append(" [").append(e.getId()).append("]");
+            sb.append("\"];\n");
+        }
+
+        sb.append("\n    %% --- Definição das Arestas (Conexões) com Pesos --- \n");
+        
+        // 2. Define as conexões
+        // Sintaxe Mermaid: ID1 -- "Texto do Peso" --- ID2
+        for (Conexao c : conexoes) {
+            sb.append("    ");
+            sb.append(c.getIdOrigem());
+            sb.append(" -- \"Peso: ").append(c.getPeso()).append("\" --- "); // Ligação sem seta
+            sb.append(c.getIdDestino());
+            sb.append(";\n");
+        }
+
+        sb.append("\n\n// --- INSTRUÇÕES ---\n");
+        sb.append("// 1. Copie todo este código (Ctrl+C).\n");
+        sb.append("// 2. Abra um editor Mermaid online (ex: mermaid.live)\n");
+        sb.append("// 3. Cole o código (Ctrl+V) no editor.\n");
+        sb.append("// 4. A imagem do seu grafo aparecerá automaticamente.\n");
+        sb.append("// 5. Exporte a imagem (como PNG ou SVG) para o seu relatório.\n");
         return sb.toString();
     }
 }
